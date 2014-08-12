@@ -1,6 +1,9 @@
 .main-body {
     min-height: 40em;
 }
+.main-body.without-submodules, .submenu {
+    margin-top: 50px;
+}
 .browser-min-width{
     min-width: 1000px;
 }

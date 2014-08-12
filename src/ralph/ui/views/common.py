@@ -194,8 +194,80 @@ class ACLGateway(object):
         return super(ACLGateway, self).dispatch(*args, **kwargs)
 
 
-class BaseMixin(ACLGateway):
-    section = 'home'
+
+from django.core.exceptions import ImproperlyConfigured
+
+
+class MenuMixin(object):
+    module_name = None
+
+    def dispatch(self, request, *args, **kwargs):
+        from ralph.menu import menu_class as ralph_menu
+        from ralph.cmdb.menu import menu_class as cmdb_menu
+        from ralph_assets.menu import menu_class as asset_menu
+        from ralph_pricing.menu import menu_class as pricing_menu
+        self.menus = [
+            ralph_menu(request),
+            cmdb_menu(request),
+            asset_menu(request),
+            pricing_menu(request),
+        ]
+        return super(MenuMixin, self).dispatch(request, *args, **kwargs)
+        # for app in pluggableapp.app_dict.values():
+        #     if isinstance(app, RalphModule):
+        #         # check app required permissions
+        #         if (app.required_permission is None or
+        #                 has_perm(app.required_permission)):
+        #             mainmenu_items.append(MenuItem(
+        #                 app.disp_name,
+        #                 fugue_icon=app.icon,
+        #                 href='/{}'.format(app.url_prefix)
+        #             ))
+    @property
+    def current_menu(self):
+        for menu in self.menus:
+            if menu.module.name == self.module_name:
+                return menu
+
+    def get_main_menu(self):
+        return [menu.module for menu in self.menus]
+
+    def get_module_name(self):
+        if not self.module_name:
+            raise ImproperlyConfigured(
+                'Menu required definition of \'module_name\'')
+        return self.module_name
+
+    def get_submodules(self):
+        return self.current_menu.get_submodules()
+
+    def get_context_data(self, **kwargs):
+        context = super(MenuMixin, self).get_context_data(**kwargs)
+        context.update({
+            'main_menu': self.get_main_menu(),
+            'module_name': self.get_module_name(),
+            'submodules': self.get_submodules(),
+        })
+        print(context)
+        return context
+
+
+class BaseMixin(MenuMixin):
+    module_name = 'module_core'
+#     def get_menus(self):
+#         for app in pluggableapp.app_dict.values():
+#             if isinstance(app, RalphModule):
+#                 # check app required permissions
+#                 if (app.required_permission is None or
+#                         has_perm(app.required_permission)):
+#                     mainmenu_items.append(MenuItem(
+#                         app.disp_name,
+#                         fugue_icon=app.icon,
+#                         href='/{}'.format(app.url_prefix)
+#                     ))
+
+
+# class BaseMixin(object):
 
     def __init__(self, *args, **kwargs):
         super(BaseMixin, self).__init__(*args, **kwargs)
@@ -203,23 +275,23 @@ class BaseMixin(ACLGateway):
         self.object = None
         self.status = ''
 
-    def tab_href(self, name, obj=''):
-        if not obj and self.object:
-            obj = self.object.id
-        if self.section == 'racks':
-            args = [self.kwargs.get('rack'), name, obj]
-        elif self.section == 'networks':
-            args = [self.kwargs.get('network'), name, obj]
-        elif self.section == 'ventures':
-            args = [self.kwargs.get('venture'), name, obj]
-        elif self.section == 'search':
-            args = [name, obj]
-        else:
-            args = []
-        return '%s?%s' % (
-            reverse(self.section, args=args),
-            self.request.GET.urlencode(),
-        )
+    # def tab_href(self, name, obj=''):
+    #     if not obj and self.object:
+    #         obj = self.object.id
+    #     if self.section == 'racks':
+    #         args = [self.kwargs.get('rack'), name, obj]
+    #     elif self.section == 'networks':
+    #         args = [self.kwargs.get('network'), name, obj]
+    #     elif self.section == 'ventures':
+    #         args = [self.kwargs.get('venture'), name, obj]
+    #     elif self.section == 'search':
+    #         args = [name, obj]
+    #     else:
+    #         args = []
+    #     return '%s?%s' % (
+    #         reverse(self.section, args=args),
+    #         self.request.GET.urlencode(),
+    #     )
 
     def get_tab_items(self):
         details = self.kwargs.get('details', 'info')
@@ -232,86 +304,86 @@ class BaseMixin(ACLGateway):
             self.object.venture if self.object else None
         )
 
-        if has_perm(Perm.read_device_info_generic, venture):
-            tab_items.extend([
-                MenuItem('Info', fugue_icon='fugue-wooden-box',
-                         href=self.tab_href('info')),
-                MenuItem('Components', fugue_icon='fugue-box',
-                         href=self.tab_href('components')),
-                MenuItem('Software', fugue_icon='fugue-disc',
-                         href=self.tab_href('software')),
-                MenuItem('Addresses', fugue_icon='fugue-network-ip',
-                         href=self.tab_href('addresses')),
-            ])
-        if has_perm(Perm.edit_device_info_financial, venture):
-            tab_items.extend([
-                MenuItem('Prices', fugue_icon='fugue-money-coin',
-                         href=self.tab_href('prices')),
-            ])
-        if has_perm(Perm.read_device_info_financial, venture):
-            tab_items.extend([
-                MenuItem('Costs', fugue_icon='fugue-wallet',
-                         href=self.tab_href('costs')),
-            ])
-        if has_perm(Perm.read_device_info_history, venture):
-            tab_items.extend([
-                MenuItem('History', fugue_icon='fugue-hourglass',
-                         href=self.tab_href('history')),
-            ])
-        if all((
-            'ralph_assets' in settings.INSTALLED_APPS,
-            has_perm(Perm.read_device_info_support, venture),
-        )):
-            tab_items.extend([
-                MenuItem(
-                    'Asset',
-                    fugue_icon='fugue-baggage-cart-box',
-                    href=self.tab_href('asset')),
-            ])
-        if ('ralph.scan' in settings.INSTALLED_APPS and
-                has_perm(Perm.edit_device_info_generic) and
-                self.kwargs.get('device')):
-            tab_items.extend([
-                MenuItem(
-                    'Scan',
-                    name='scan',
-                    fugue_icon='fugue-flashlight',
-                    href=self.tab_href('scan'),
-                ),
-            ])
-        if ('ralph.cmdb' in settings.INSTALLED_APPS and
-                has_perm(Perm.read_configuration_item_info_generic)):
-            ci = ''
-            device_id = self.kwargs.get('device')
-            if device_id:
-                deleted = False
-                if self.request.GET.get('deleted', '').lower() == 'on':
-                    deleted = True
-                try:
-                    if deleted:
-                        device = Device.admin_objects.get(pk=device_id)
-                    else:
-                        device = Device.objects.get(pk=device_id)
-                    ci = CI.get_by_content_object(device)
-                except Device.DoesNotExist:
-                    pass
-            if ci:
-                tab_items.extend([
-                    MenuItem(
-                        'CMDB', fugue_icon='fugue-thermometer',
-                        href='/cmdb/ci/view/%s' % ci.id
-                    ),
-                ])
-        if has_perm(Perm.read_device_info_reports, venture):
-            tab_items.extend([
-                MenuItem('Reports', fugue_icon='fugue-reports-stack',
-                         href=self.tab_href('reports')),
-            ])
-        if details == 'bulkedit':
-            tab_items.extend([
-                MenuItem('Bulk edit', fugue_icon='fugue-pencil-field',
-                         name='bulkedit'),
-            ])
+        # if has_perm(Perm.read_device_info_generic, venture):
+        #     tab_items.extend([
+        #         MenuItem('Info', fugue_icon='fugue-wooden-box',
+        #                  href=self.tab_href('info')),
+        #         MenuItem('Components', fugue_icon='fugue-box',
+        #                  href=self.tab_href('components')),
+        #         MenuItem('Software', fugue_icon='fugue-disc',
+        #                  href=self.tab_href('software')),
+        #         MenuItem('Addresses', fugue_icon='fugue-network-ip',
+        #                  href=self.tab_href('addresses')),
+        #     ])
+        # if has_perm(Perm.edit_device_info_financial, venture):
+        #     tab_items.extend([
+        #         MenuItem('Prices', fugue_icon='fugue-money-coin',
+        #                  href=self.tab_href('prices')),
+        #     ])
+        # if has_perm(Perm.read_device_info_financial, venture):
+        #     tab_items.extend([
+        #         MenuItem('Costs', fugue_icon='fugue-wallet',
+        #                  href=self.tab_href('costs')),
+        #     ])
+        # if has_perm(Perm.read_device_info_history, venture):
+        #     tab_items.extend([
+        #         MenuItem('History', fugue_icon='fugue-hourglass',
+        #                  href=self.tab_href('history')),
+        #     ])
+        # if all((
+        #     'ralph_assets' in settings.INSTALLED_APPS,
+        #     has_perm(Perm.read_device_info_support, venture),
+        # )):
+        #     tab_items.extend([
+        #         MenuItem(
+        #             'Asset',
+        #             fugue_icon='fugue-baggage-cart-box',
+        #             href=self.tab_href('asset')),
+        #     ])
+        # if ('ralph.scan' in settings.INSTALLED_APPS and
+        #         has_perm(Perm.edit_device_info_generic) and
+        #         self.kwargs.get('device')):
+        #     tab_items.extend([
+        #         MenuItem(
+        #             'Scan',
+        #             name='scan',
+        #             fugue_icon='fugue-flashlight',
+        #             href=self.tab_href('scan'),
+        #         ),
+        #     ])
+        # if ('ralph.cmdb' in settings.INSTALLED_APPS and
+        #         has_perm(Perm.read_configuration_item_info_generic)):
+        #     ci = ''
+        #     device_id = self.kwargs.get('device')
+        #     if device_id:
+        #         deleted = False
+        #         if self.request.GET.get('deleted', '').lower() == 'on':
+        #             deleted = True
+        #         try:
+        #             if deleted:
+        #                 device = Device.admin_objects.get(pk=device_id)
+        #             else:
+        #                 device = Device.objects.get(pk=device_id)
+        #             ci = CI.get_by_content_object(device)
+        #         except Device.DoesNotExist:
+        #             pass
+        #     if ci:
+        #         tab_items.extend([
+        #             MenuItem(
+        #                 'CMDB', fugue_icon='fugue-thermometer',
+        #                 href='/cmdb/ci/view/%s' % ci.id
+        #             ),
+        #         ])
+        # if has_perm(Perm.read_device_info_reports, venture):
+        #     tab_items.extend([
+        #         MenuItem('Reports', fugue_icon='fugue-reports-stack',
+        #                  href=self.tab_href('reports')),
+        #     ])
+        # if details == 'bulkedit':
+        #     tab_items.extend([
+        #         MenuItem('Bulk edit', fugue_icon='fugue-pencil-field',
+        #                  name='bulkedit'),
+        #     ])
         return tab_items
 
     def get_context_data(self, **kwargs):
@@ -320,98 +392,107 @@ class BaseMixin(ACLGateway):
         profile = self.request.user.get_profile()
         has_perm = profile.has_perm
         footer_items = []
-        mainmenu_items = [
-            MenuItem('Ventures', fugue_icon='fugue-store',
-                     view_name='ventures')
-        ]
-        if has_perm(Perm.read_dc_structure):
-            mainmenu_items.append(
-                MenuItem('Racks', fugue_icon='fugue-building',
-                         view_name='racks'))
-        if has_perm(Perm.read_network_structure):
-            mainmenu_items.append(
-                MenuItem('Networks', fugue_icon='fugue-weather-clouds',
-                         view_name='networks'))
-        if has_perm(Perm.read_device_info_reports):
-            mainmenu_items.append(
-                MenuItem('Reports', fugue_icon='fugue-report',
-                         view_name='reports'))
-        mainmenu_items.append(
-            MenuItem('Ralph CLI', fugue_icon='fugue-terminal',
-                     href='#beast'))
-        mainmenu_items.append(
-            MenuItem('Quick scan', fugue_icon='fugue-radar',
-                     href='#quickscan'))
 
-        if ('ralph.cmdb' in settings.INSTALLED_APPS and
-                has_perm(Perm.read_configuration_item_info_generic)):
-            mainmenu_items.append(
-                MenuItem('CMDB', fugue_icon='fugue-thermometer',
-                         href='/cmdb/changes/timeline')
-            )
+        # submenu_items = [
+        #     MenuItem('Ventures', fugue_icon='fugue-store',
+        #              view_name='ventures')
+        # ]
 
-        for app in pluggableapp.app_dict.values():
-            if isinstance(app, RalphModule):
-                # check app required permissions
-                if (app.required_permission is None or
-                        has_perm(app.required_permission)):
-                    mainmenu_items.append(MenuItem(
-                        app.disp_name,
-                        fugue_icon=app.icon,
-                        href='/{}'.format(app.url_prefix)
-                    ))
+        # if has_perm(Perm.read_dc_structure):
+        #     submenu_items.append(
+        #         MenuItem('Racks', fugue_icon='fugue-building',
+        #                  view_name='racks'))
+        # if has_perm(Perm.read_network_structure):
+        #     submenu_items.append(
+        #         MenuItem('Networks', fugue_icon='fugue-weather-clouds',
+        #                  view_name='networks'))
+        # if has_perm(Perm.read_device_info_reports):
+        #     submenu_items.append(
+        #         MenuItem('Reports', fugue_icon='fugue-report',
+        #                  view_name='reports'))
+        # submenu_items.append(
+        #     MenuItem('Ralph CLI', fugue_icon='fugue-terminal',
+        #              href='#beast'))
+        # submenu_items.append(
+        #     MenuItem('Quick scan', fugue_icon='fugue-radar',
+        #              href='#quickscan'))
 
-        if settings.BUGTRACKER_URL:
-            footer_items.append(
-                MenuItem(
-                    'Report a bug', fugue_icon='fugue-bug', pull_right=True,
-                    href=settings.BUGTRACKER_URL)
-            )
-        footer_items.append(
-            MenuItem(
-                "Version %s" % '.'.join((str(part) for part in VERSION)),
-                fugue_icon='fugue-document-number',
-                href=CHANGELOG_URL,
-            )
-        )
-        if self.request.user.is_staff:
-            footer_items.append(
-                MenuItem('Admin', fugue_icon='fugue-toolbox', href='/admin'))
-        footer_items.append(
-            MenuItem(
-                '%s (preference)' % self.request.user,
-                fugue_icon='fugue-user',
-                view_name='preference',
-                view_args=[details or 'info', ''],
-                pull_right=True,
-                href=reverse('user_preference', args=[]),
-            )
-        )
-        footer_items.append(
-            MenuItem(
-                'logout',
-                fugue_icon='fugue-door-open-out',
-                view_name='logout',
-                view_args=[details or 'info', ''],
-                pull_right=True,
-                href=settings.LOGOUT_URL,
-            )
-        )
-        mainmenu_items.append(
-            MenuItem(
-                'Advanced search',
-                name='search',
-                fugue_icon='fugue-magnifier',
-                view_args=[details or 'info', ''],
-                view_name='search',
-                pull_right=True,
-            )
-        )
+        # mainmenu_items = [
+        #     MenuItem('Core', name='module_core', fugue_icon='fugue-store',
+        #              view_name='ventures'),
+        # ]
+
+        # if ('ralph.cmdb' in settings.INSTALLED_APPS and
+        #         has_perm(Perm.read_configuration_item_info_generic)):
+        #     mainmenu_items.append(
+        #         MenuItem('CMDB', fugue_icon='fugue-thermometer',
+        #                  href='/cmdb/changes/timeline')
+        #     )
+
+        # for app in pluggableapp.app_dict.values():
+        #     if isinstance(app, RalphModule):
+        #         # check app required permissions
+        #         if (app.required_permission is None or
+        #                 has_perm(app.required_permission)):
+        #             mainmenu_items.append(MenuItem(
+        #                 app.disp_name,
+        #                 fugue_icon=app.icon,
+        #                 href='/{}'.format(app.url_prefix)
+        #             ))
+
+        # if settings.BUGTRACKER_URL:
+        #     footer_items.append(
+        #         MenuItem(
+        #             'Report a bug', fugue_icon='fugue-bug', pull_right=True,
+        #             href=settings.BUGTRACKER_URL)
+        #     )
+        # footer_items.append(
+        #     MenuItem(
+        #         "Version %s" % '.'.join((str(part) for part in VERSION)),
+        #         fugue_icon='fugue-document-number',
+        #         href=CHANGELOG_URL,
+        #     )
+        # )
+        # if self.request.user.is_staff:
+        #     footer_items.append(
+        #         MenuItem('Admin', fugue_icon='fugue-toolbox', href='/admin'))
+        # footer_items.append(
+        #     MenuItem(
+        #         '%s (preference)' % self.request.user,
+        #         fugue_icon='fugue-user',
+        #         view_name='preference',
+        #         view_args=[details or 'info', ''],
+        #         pull_right=True,
+        #         href=reverse('user_preference', args=[]),
+        #     )
+        # )
+        # footer_items.append(
+        #     MenuItem(
+        #         'logout',
+        #         fugue_icon='fugue-door-open-out',
+        #         view_name='logout',
+        #         view_args=[details or 'info', ''],
+        #         pull_right=True,
+        #         href=settings.LOGOUT_URL,
+        #     )
+        # )
+        # mainmenu_items.append(
+        #     MenuItem(
+        #         'Advanced search',
+        #         name='search',
+        #         fugue_icon='fugue-magnifier',
+        #         view_args=[details or 'info', ''],
+        #         view_name='search',
+        #         pull_right=True,
+        #     )
+        # )
         tab_items = self.get_tab_items()
         ret.update({
-            'section': self.section,
+            'module': 'module_core',
+            # 'section': self.section,
             'details': details,
-            'mainmenu_items': mainmenu_items,
+            # 'submenu_items': submenu_items,
+            # 'mainmenu_items': mainmenu_items,
             'footer_items': footer_items,
             'url_query': self.request.GET,
             'search_url': reverse('search', args=[details, '']),
@@ -1103,7 +1184,7 @@ class Purchase(DeviceUpdateView):
         return ret
 
 
-class Asset(BaseMixin, TemplateView):
+class Asset(MenuMixin, TemplateView):
     template_name = 'ui/device_asset.html'
     form = None
     asset = None

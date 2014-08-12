@@ -66,6 +66,7 @@ SAVE_PRIORITY = 200
 class BaseCMDBView(Base):
     template_name = 'nope.html'
     Form = CIRelationEditForm
+    module_name = 'module_cmdb'
 
     def generate_breadcrumb(self):
         parent = self.request.GET.get('parent', '')
