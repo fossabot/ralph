@@ -13,20 +13,21 @@ from urlparse import urljoin
 from bob.data_table import DataTableMixin
 from bob.menu import MenuItem, MenuHeader
 
-from django.db.models import Q
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import get_object_or_404
-from django.contrib import messages
-from django.http import HttpResponseRedirect
-from django.http import HttpResponseForbidden
+from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponse
-from django.utils.translation import ugettext_lazy as _
-from django.utils.safestring import mark_safe
+from django.http import HttpResponseForbidden
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.utils import simplejson
 from django.utils.html import escape
-from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
+from django.views.generic import TemplateView
 
 from lck.cache.memoization import memoize
 from lck.django.common import nested_commit_on_success
@@ -51,7 +52,7 @@ from ralph.cmdb.models_ci import (
 )
 import ralph.cmdb.models as db
 from ralph.cmdb.graphs import ImpactCalculator
-from ralph.ui.views.common import Base
+from ralph.ui.views.common import MenuMixin
 from ralph.cmdb.forms import (
     ReportFilters,
     ReportFiltersDateRange,
@@ -63,10 +64,11 @@ ROWS_PER_PAGE = 20
 SAVE_PRIORITY = 200
 
 
-class BaseCMDBView(Base):
+class BaseCMDBView(MenuMixin, TemplateView):
     template_name = 'nope.html'
     Form = CIRelationEditForm
     module_name = 'module_cmdb'
+    submodule_name = 'changes'
 
     def generate_breadcrumb(self):
         parent = self.request.GET.get('parent', '')

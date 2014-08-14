@@ -1,9 +1,23 @@
 .main-body {
     min-height: 40em;
 }
-.main-body.without-submodules, .submenu {
-    margin-top: 50px;
+.main-body.without-submodules{margin-top: 50px;}
+.main-body.with-submodules{margin-top: 85px;}
+.submenu {
+    margin-top: 35px;
+    padding-top: 10px;
+    background-color: #e5e5e5;
+    right:0;
+    left:0;
+    position: fixed;
+    border-bottom: 5px solid #fff;
+    z-index: 1000;
 }
+.submenu .nav.nav-tabs {
+    margin: auto;
+    margin-left: 20px;
+}
+
 .browser-min-width{
     min-width: 1000px;
 }
