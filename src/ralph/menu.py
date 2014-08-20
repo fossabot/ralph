@@ -19,6 +19,9 @@ class Menu(object):
         profile = self.request.user.get_profile()
         self.has_perm = profile.has_perm
 
+    def generate_menu_items(self, data):
+        return [MenuItem(**t) for t in data]
+
     def get_module(self):
         if not self.module:
             raise ImproperlyConfigured(
@@ -34,17 +37,20 @@ class Menu(object):
     def get_active_submodule(self):
         if not self.submodule:
             raise ImproperlyConfigured(
-                'Menu required definition of \'submodule\' or an implementation '
-                'of \'get_submodule()\'')
+                'Menu required definition of \'submodule\' or an '
+                'implementation of \'get_active_submodule()\'')
 
         if not isinstance(self.submodule, MenuItem):
             raise ImproperlyConfigured(
-                'subModule must inheritence from \'MenuItem\'')
+                'submodule must inheritence from \'MenuItem\'')
 
         return self.submodule
 
     def get_submodules(self):
         return []
+
+    def get_sidebar_items(self):
+        return {}
 
 
 class CoreMenu(Menu):

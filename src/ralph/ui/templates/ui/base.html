@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {% load url from future %}
-{% load icons bob %}
+{% load icons bob i18n %}
 <html>
     <head>
         <meta charset="utf-8">
@@ -40,33 +40,38 @@
                     {% block header %}
                         {% main_menu main_menu active_module position='fixed' white="true" title='Ralph 2' %}
                     {% endblock %}
+                    {{ view }}
                 </div>
                 {% if submodules %}
                     <div class="submenu">
                         {% tab_menu submodules active_submodule %}
                     </div>
                 {% endif %}
-                {% if messages %}
-                    <div class="row-fluid">
-                        <div class="span12 alerts">
-                            {% block alerts %}
-                                {% for message in messages %}
-                                    <div class="alert alert-{{ message.tags }} fade in">
-                                        <a class="close" data-dismiss="alert" href="#">&times;</a>
-                                        <p>{{ message.tags|alert_icon }} {{ message }}</p>
-                                    </div>
-                                {% endfor %}
-                            {% endblock %}
-                        </div>
-                    </div>
-                {% endif %}
                 <div class="row-fluid main-body{% if not submodules %} without-submodules{%  else %} with-submodules{% endif %}">
                     {% block base_sidebar %}
                         <div class="{% block sidebar_span %}span2{% endblock %}">
-                            {% block sidebar %}{% endblock %}
+                            {% block sidebar %}
+                                {% if sidebar %}
+                                    {% sidebar_menu sidebar active_sidebar_item %}
+                                {% endif %}
+                            {% endblock %}
                         </div>
                     {% endblock %}
                     <div class="{% block content_span %}span10{% endblock %}">
+                        {% if messages %}
+                            <div class="row-fluid">
+                                <div class="span12 alerts">
+                                    {% block alerts %}
+                                        {% for message in messages %}
+                                            <div class="alert alert-{{ message.tags }} fade in">
+                                                <a class="close" data-dismiss="alert" href="#">&times;</a>
+                                                <p>{{ message.tags|alert_icon }} {{ message }}</p>
+                                            </div>
+                                        {% endfor %}
+                                    {% endblock %}
+                                </div>
+                            </div>
+                        {% endif %}
                         {% block breadcrumbs %}{% endblock %}
                         {% block tabs %}{% endblock %}
                         <div class="row-fluid">
@@ -76,11 +81,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="row-fluid">
+                <footer class="row-fluid base">
                     <div class="span12">
-                        {% main_menu footer_items section white="true" %}
+                        <ul class="pull-left">
+                            <li>Ralph {{ VERSION }}</li>
+                            <li><a href="{{ CHANGELOG_URL }}">{% trans 'Changes' %}</a></li>
+                        </ul>
+                        <ul class="pull-right">
+                            <li>
+                                <a href="{{ BUGTRACKER_URL }}">
+                                <i class="fugue-icon fugue-bug"></i>{% trans 'Report a bug' %}</a>
+                            </li>
+                        </ul>
                     </div>
-                </div>
+                </footer>
             </div>
         </div>
         <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>

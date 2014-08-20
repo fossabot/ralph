@@ -6,7 +6,7 @@
 
 
 {% block sidebar %}
-    {% if searchform %}    
+    {% if searchform %}
         <form class="form search-form well well-small"
         {% if not searchform_filter %}action="{% url 'search' details '' %}"{% endif %} >
         {% for f in searchform %}
@@ -64,7 +64,7 @@
         {% endif %}
 
 
-    {% if sidebar_items %}    
+    {% if sidebar_items %}
         {% sidebar_menu sidebar_items sidebar_selected %}
     {% endif %}
 

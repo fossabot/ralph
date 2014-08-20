@@ -5,6 +5,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import datetime
+import importlib
 
 import ipaddr
 
@@ -29,7 +30,7 @@ from django.views.generic import (
 
 from lck.django.common import nested_commit_on_success
 from lck.django.tags.models import Language, TagStem
-from bob.menu import MenuItem
+from bob.menu import MenuItem, Divider
 import pluggableapp
 from powerdns.models import Record
 
@@ -78,6 +79,7 @@ from ralph.discovery.models_history import (
     FOREVER_DATE,
     ALWAYS_DATE,
 )
+from ralph.menu import menu_class as ralph_menu
 from ralph.util import presentation, pricing
 from ralph.util.plugin import BY_NAME as AVAILABLE_PLUGINS
 from ralph.ui.forms import ChooseAssetForm
@@ -99,7 +101,6 @@ from ralph.ui.forms.deployment import (
     ServerMoveStep2FormSet,
     ServerMoveStep3FormSet,
 )
-from ralph import VERSION
 
 
 SAVE_PRIORITY = 215
@@ -196,52 +197,81 @@ class ACLGateway(object):
         return super(ACLGateway, self).dispatch(*args, **kwargs)
 
 
+class UserMenu(Menu):
+
+    def __init__(self, request, **kwargs):
+
+        self.module = MenuItem(
+            '{}'.format(request.user),
+            name='user_preference',
+            fugue_icon='fugue-user',
+            view_name='user_preference',
+            pull_right=True,
+            dropdown=True,
+            subitems=[
+                MenuItem(
+                    'Preferences',
+                    name='user_preference',
+                    fugue_icon='fugue-application-task',
+                    view_name='user_preference',
+                ),
+                Divider(),
+                MenuItem(
+                    'Logout',
+                    name='user_preference',
+                    fugue_icon='fugue-door-open-out',
+                    view_name='user_preference',
+                ),
+            ]
+        )
+        super(UserMenu, self).__init__(request, **kwargs)
+
+
 class AdminMenu(Menu):
+
     module = MenuItem(
         'Admin',
+        name='admin',
         fugue_icon='fugue-toolbox',
-        href='/admin',
-        pull_right=True
-    )
-
-
-class UserMenu(Menu):
-    module = MenuItem(
-        'Core',
-        name='module_core',
-        fugue_icon='fugue-processor',
-        view_name='ventures',
+        href='/admin/',
+        pull_right=True,
     )
 
 
 class MenuMixin(object):
     module_name = None
     submodule_name = None
+    sidebar_item_name = None
 
     def dispatch(self, request, *args, **kwargs):
-        from ralph.menu import menu_class as ralph_menu
-        from ralph.cmdb.menu import menu_class as cmdb_menu
-        from ralph_assets.menu import menu_class as asset_menu
-        from ralph_pricing.menu import menu_class as pricing_menu
-        self.menus = [
-            ralph_menu(request),
-            cmdb_menu(request),
-            asset_menu(request),
-            pricing_menu(request),
-        ]
-        if request.user:
-            self.menus.append(UserMenu(request))
+        self.menus = [ralph_menu(request)]
+        if 'ralph.cmdb' in settings.INSTALLED_APPS:
+            from ralph.cmdb.menu import menu_class as cmdb_menu
+            self.menus.append(cmdb_menu(request))
+        profile = request.user.get_profile()
+        has_perm = profile.has_perm
+        if request.user.is_staff:
+            self.menus.append(AdminMenu(request))
+        self.menus.append(UserMenu(request))
+        for app in pluggableapp.app_dict.values():
+            if isinstance(app, RalphModule):
+                # check app required permissions
+                if (app.required_permission is None or
+                        has_perm(app.required_permission)):
+                    menu_module = importlib.import_module(
+                        '.menu', app.module_name
+                    )
+                    if menu_module:
+                        menu_class = getattr(
+                            menu_module, 'menu_class', None
+                        )
+                        if not menu_class:
+                            raise Exception(
+                                'Please provide menu_class.'
+                            )
+                        self.menus.append(menu_class(request))
         return super(MenuMixin, self).dispatch(request, *args, **kwargs)
-        # for app in pluggableapp.app_dict.values():
-        #     if isinstance(app, RalphModule):
-        #         # check app required permissions
-        #         if (app.required_permission is None or
-        #                 has_perm(app.required_permission)):
-        #             mainmenu_items.append(MenuItem(
-        #                 app.disp_name,
-        #                 fugue_icon=app.icon,
-        #                 href='/{}'.format(app.url_prefix)
-        #             ))
+
     @property
     def current_menu(self):
         for menu in self.menus:
@@ -264,6 +294,10 @@ class MenuMixin(object):
                     view=self.__class__))
         return self.submodule_name
 
+    @property
+    def active_sidebar_item(self):
+        return self.sidebar_item_name
+
     def get_modules(self):
         main_menu = [menu.module for menu in self.menus]
         return main_menu
@@ -273,12 +307,18 @@ class MenuMixin(object):
 
     def get_context_data(self, **kwargs):
         context = super(MenuMixin, self).get_context_data(**kwargs)
+        current_menu = self.current_menu
+        sidebar = current_menu.get_sidebar_items().get(
+            self.active_submodule, None
+        )
         context.update({
             'main_menu': self.get_modules(),
             'submodules': self.get_submodules(),
-            'active_menu': self.current_menu,
+            'sidebar': sidebar,
+            'active_menu': current_menu,
             'active_module': self.active_module,
             'active_submodule': self.active_submodule,
+            'active_sidebar_item': self.active_sidebar_item,
         })
         return context
 
@@ -409,71 +449,9 @@ class BaseMixin(MenuMixin, ACLGateway):
         details = self.kwargs.get('details', 'info')
         profile = self.request.user.get_profile()
         has_perm = profile.has_perm
-        footer_items = []
-
-        # mainmenu_items = [
-        #     MenuItem('Core', name='module_core', fugue_icon='fugue-store',
-        #              view_name='ventures'),
-        # ]
-
-        # if ('ralph.cmdb' in settings.INSTALLED_APPS and
-        #         has_perm(Perm.read_configuration_item_info_generic)):
-        #     mainmenu_items.append(
-        #         MenuItem('CMDB', fugue_icon='fugue-thermometer',
-        #                  href='/cmdb/changes/timeline')
-        #     )
-
-        # if settings.BUGTRACKER_URL:
-        #     footer_items.append(
-        #         MenuItem(
-        #             'Report a bug', fugue_icon='fugue-bug', pull_right=True,
-        #             href=settings.BUGTRACKER_URL)
-        #     )
-        # footer_items.append(
-        #     MenuItem(
-        #         "Version %s" % '.'.join((str(part) for part in VERSION)),
-        #         fugue_icon='fugue-document-number',
-        #         href=CHANGELOG_URL,
-        #     )
-        # )
-        # if self.request.user.is_staff:
-        #     footer_items.append(
-        #         MenuItem('Admin', fugue_icon='fugue-toolbox', href='/admin'))
-        # footer_items.append(
-        #     MenuItem(
-        #         '%s (preference)' % self.request.user,
-        #         fugue_icon='fugue-user',
-        #         view_name='preference',
-        #         view_args=[details or 'info', ''],
-        #         pull_right=True,
-        #         href=reverse('user_preference', args=[]),
-        #     )
-        # )
-        # footer_items.append(
-        #     MenuItem(
-        #         'logout',
-        #         fugue_icon='fugue-door-open-out',
-        #         view_name='logout',
-        #         view_args=[details or 'info', ''],
-        #         pull_right=True,
-        #         href=settings.LOGOUT_URL,
-        #     )
-        # )
-        # mainmenu_items.append(
-        #     MenuItem(
-        #         'Advanced search',
-        #         name='search',
-        #         fugue_icon='fugue-magnifier',
-        #         view_args=[details or 'info', ''],
-        #         view_name='search',
-        #         pull_right=True,
-        #     )
-        # )
         tab_items = self.get_tab_items()
         ret.update({
-            'module': 'module_core',
             'details': details,
-            'footer_items': footer_items,
             'url_query': self.request.GET,
             'search_url': reverse('search', args=[details, '']),
             'user': self.request.user,
@@ -1563,7 +1541,8 @@ class Scan(BaseMixin, TemplateView):
         if not plugins:
             messages.error(self.request, "You have to select some plugins.")
             return self.get(*args, **kwargs)
-        ip_address = self.kwargs.get('address') or self.request.GET.get('address')
+        ip_address = (self.kwargs.get('address')
+                      or self.request.GET.get('address'))
         if ip_address:
             try:
                 ipaddr.IPAddress(ip_address)
