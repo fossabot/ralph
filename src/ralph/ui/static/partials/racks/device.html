@@ -1,9 +1,11 @@
-<div
+<a
+    href="/assets/dc/add/device/?data_center={{ rack.data_center }}&rack={{ rack.id }}&server_room={{ server_room }}&orientation={{ side.type_id }}&position={{ item.position }}"
+    target="_blank"
     ng-if="item.empty"
     class="device height-u-1 empty position-u-{{ item.position }}"
     ng-class="{active: active}"
 >
-</div>
+</a>
 
 <div
     ng-if="!item.empty"
