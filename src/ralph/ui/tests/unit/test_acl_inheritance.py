@@ -36,6 +36,7 @@ class ACLInheritanceTest(TestCase):
 
             ('stats', 'django_rq.views'),  # 'django_rq' is a separate app ('^rq/' urls)
             ('jobs', 'django_rq.views'),
+            ('clear_queue', 'django_rq.views'),
             ('job_detail', 'django_rq.views'),
             ('delete_job', 'django_rq.views'),
             ('requeue_job_view', 'django_rq.views'),
@@ -64,6 +65,7 @@ class ACLInheritanceTest(TestCase):
             # ('puppet_classifier', 'ralph.deployment.views'),
 
             ('UserHomePage', 'ralph.account.views'),
+            ('RedirectView', 'django.views.generic.base'),
         ]
 
         # constructing a list of URL patterns for testing
