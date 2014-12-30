@@ -21,7 +21,8 @@ class LastSeen(db.Model):
     class Meta:
         abstract = True
 
-    def save(self, update_last_seen=False, *args, **kwargs):
+    def save(self, *args, **kwargs):
+        update_last_seen = kwargs.pop('update_last_seen', False)
         if update_last_seen:
             self.last_seen = datetime.now()
         super(LastSeen, self).save(*args, **kwargs)

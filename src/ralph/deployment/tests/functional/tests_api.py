@@ -68,7 +68,7 @@ class TestVMCreation(UserTestCase):
 
     fixtures=['vm_creation_setup']
 
-    def test_correct(self): 
+    def test_correct(self):
         """Correctly setup the new VM"""
         rack = Device.objects.get(pk=1)
         response = self.post(
@@ -87,7 +87,7 @@ class TestVMCreation(UserTestCase):
         self.assertEqual(new_vm_data['dc'], rack.dc)
 
 
-    def test_correct_null_role(self): 
+    def test_correct_null_role(self):
         """Correctly setup the new VM, no role provided"""
         response = self.post(
             '/api/add_vm', json.dumps({
@@ -128,7 +128,7 @@ class TestVMCreation(UserTestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    def test_nonexistent_network(self): 
+    def test_nonexistent_network(self):
         """Providing a network that doesn't exist"""
         response = self.post(
             '/api/add_vm', json.dumps({
@@ -142,7 +142,7 @@ class TestVMCreation(UserTestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    def test_nonexistent_venture(self): 
+    def test_nonexistent_venture(self):
         """Providing a venture that doesn't exist"""
         response = self.post(
             '/api/add_vm', json.dumps({
@@ -156,7 +156,7 @@ class TestVMCreation(UserTestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    def test_nonexistent_role(self): 
+    def test_nonexistent_role(self):
         """Providing a venturerole that doesn't exist"""
         response = self.post(
             '/api/add_vm', json.dumps({
@@ -198,7 +198,7 @@ class TestVMCreation(UserTestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    def test_rackless_parent(self): 
+    def test_rackless_parent(self):
         """Trying to use a parent without a rack"""
         response = self.post(
             '/api/add_vm', json.dumps({
@@ -213,7 +213,7 @@ class TestVMCreation(UserTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-    def test_wrong_environment(self): 
+    def test_wrong_environment(self):
         """Trying to use an environment without template configuration"""
         response = self.post(
             '/api/add_vm', json.dumps({

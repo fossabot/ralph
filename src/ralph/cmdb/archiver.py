@@ -7,7 +7,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from django.db import connection
-from lck.django.common import nested_commit_on_success
 
 from ralph.cmdb.models import (
     ArchivedCIChange,
@@ -46,7 +45,7 @@ def _get_db_columns_for_model(model):
     """
     Return list of columns names for passed model.
     """
-    return [field.column for field in model._meta._fields()]
+    return [field.column for field in model._meta.fields]
 
 
 def _get_db_table_for_model(model):
@@ -226,7 +225,6 @@ def _remove_old_data(model, older_than, change_type, parent_model=None):
     cursor.execute(sql, params)
 
 
-@nested_commit_on_success
 def run_cichange_git_archivization(older_than):
     _run_archivization(
         CIChange,
@@ -254,7 +252,6 @@ def run_cichange_git_archivization(older_than):
     )
 
 
-@nested_commit_on_success
 def run_cichange_zabbix_archivization(older_than):
     _run_archivization(
         CIChange,
@@ -282,7 +279,6 @@ def run_cichange_zabbix_archivization(older_than):
     )
 
 
-@nested_commit_on_success
 def run_cichange_cmdb_history_archivization(older_than):
     _run_archivization(
         CIChange,
@@ -310,7 +306,6 @@ def run_cichange_cmdb_history_archivization(older_than):
     )
 
 
-@nested_commit_on_success
 def run_cichange_device_archivization(older_than):
     _run_archivization(
         CIChange,
@@ -325,7 +320,6 @@ def run_cichange_device_archivization(older_than):
     )
 
 
-@nested_commit_on_success
 def run_cichange_puppet_archivization(older_than):
     _run_archivization(
         CIChange,

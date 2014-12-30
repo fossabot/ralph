@@ -29,7 +29,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView
 
 from lck.cache.memoization import memoize
-from lck.django.common import nested_commit_on_success
 
 from ralph.account.models import Perm, ralph_permission
 
@@ -176,7 +175,6 @@ class EditRelation(BaseCMDBView):
         self.rel = rel
         return super(EditRelation, self).get(*args, **kwargs)
 
-    @nested_commit_on_success
     def post(self, *args, **kwargs):
         self.form = None
         self.rel = None
@@ -248,7 +246,6 @@ class AddRelation(BaseCMDBView):
         self.form = self.Form(**self.form_options)
         return super(AddRelation, self).get(*args, **kwargs)
 
-    @nested_commit_on_success
     def post(self, *args, **kwargs):
         self.form = None
         self.rel = None
@@ -295,7 +292,6 @@ class Add(BaseCMDBView):
         self.form = self.Form(**self.form_options)
         return super(Add, self).get(*args, **kwargs)
 
-    @nested_commit_on_success
     def post(self, *args, **kwargs):
         self.form = None
         self.ci = None
@@ -556,7 +552,6 @@ class MainCIEdit(BaseCIDetails):
         self.form = self.Form(**self.form_options)
         return super(MainCIEdit, self).get(*args, **kwargs)
 
-    @nested_commit_on_success
     def post(self, *args, **kwargs):
         self.initialize_vars()
         ci_id = self.kwargs.get('ci_id')

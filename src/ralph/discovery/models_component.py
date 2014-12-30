@@ -268,7 +268,7 @@ class ComponentModel(SavePrioritized, WithConcurrentGetOrCreate, SavingUser):
         return True if self.type == ComponentType.software else False
 
 
-class Component(SavePrioritized, WithConcurrentGetOrCreate):
+class Component(WithConcurrentGetOrCreate, SavePrioritized):
     device = db.ForeignKey('Device', verbose_name=_("device"))
     model = db.ForeignKey(
         ComponentModel,
@@ -355,7 +355,7 @@ class DiskShare(Component):
         return (self.size or 0) + (self.snapshot_size or 0)
 
 
-class DiskShareMount(TimeTrackable, WithConcurrentGetOrCreate):
+class DiskShareMount(WithConcurrentGetOrCreate, TimeTrackable):
     share = db.ForeignKey(DiskShare, verbose_name=_("share"))
     device = db.ForeignKey('Device', verbose_name=_("device"), null=True,
                            blank=True, default=None, on_delete=db.SET_NULL)

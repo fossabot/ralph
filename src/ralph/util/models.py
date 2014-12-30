@@ -57,8 +57,8 @@ class SyncFieldMixin(db.Model):
         # by default save with the same priority as in 'edit device' forms etc.
         visited = visited or set()
         visited.add(self)
-        priority = kwargs.get('priority')
-        change_author = kwargs.get('user')
+        priority = kwargs.get('priority', None)
+        change_author = kwargs.get('user', None)
         if priority is None:
             priority = SAVE_PRIORITY
         changes = []
@@ -67,7 +67,12 @@ class SyncFieldMixin(db.Model):
                 continue
             for f in fields:
                 setattr(obj, f, getattr(self, f))
-            obj.save(visited=visited, mute=True, priority=priority)
+            # TODO: replace this ugly try-except block - it's exist cause
+            # asset doesn't have `priority`
+            try:
+                obj.save(visited=visited, mute=True, priority=priority)
+            except TypeError:
+                obj.save(visited=visited, mute=True)
         if not mute:
             changes = []
             try:

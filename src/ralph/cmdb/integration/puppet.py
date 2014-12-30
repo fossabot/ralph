@@ -19,7 +19,6 @@ from ralph.cmdb import models as db
 from ralph.cmdb.integration.base import BaseImporter
 from ralph.cmdb.integration.util import strip_timezone
 
-from lck.django.common import nested_commit_on_success
 
 logger = logging.getLogger(__name__)
 
@@ -108,7 +107,6 @@ class PuppetGitImporter(BaseImporter):
     def is_imported(self, changeset):
         return db.CIChangeGit.objects.filter(changeset=changeset).exists()
 
-    @nested_commit_on_success
     def import_changeset(self, changeset):
         x = self.fisheye
         details = x.get_details(changeset)

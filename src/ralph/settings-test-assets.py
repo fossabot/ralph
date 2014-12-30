@@ -18,3 +18,17 @@ PLUGGABLE_APPS = ['cmdb', 'assets']
 SOUTH_TESTS_MIGRATE = False
 
 ASSETS_AUTO_ASSIGN_HOSTNAME = True
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ralph',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': '',
+        'PORT': '',
+        'OPTIONS': dict(
+        ),
+    },
+}

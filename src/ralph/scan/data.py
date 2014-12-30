@@ -248,7 +248,13 @@ def _update_component_data(
             else:
                 if model:
                     component.model = model
-        component.save(priority=save_priority)
+
+        # TODO: ex. DiskShareMount doesn't have priority
+        # lck's monkey patch is to blame for that :(
+        try:
+            component.save(priority=save_priority)
+        except TypeError:
+            component.save()
         component_ids.append(component.id)
     # Delete the components that are no longer current
     for component in Component.objects.filter(
