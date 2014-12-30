@@ -16,6 +16,7 @@ install:
   - make install
   - pip install git+https://github.com/allegro/ralph_assets.git@develop
   - pip install git+https://github.com/ar4s/InkPy.git@bumped-django-rq
+  - pip install git+https://github.com/ar4s/kitdjango.git@develop
   - pip install coveralls
   - pip install flake8
 
