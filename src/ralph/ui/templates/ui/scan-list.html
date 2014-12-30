@@ -9,12 +9,12 @@
 {% else %}
 <ul class="nav nav-tabs">
   <li {% if change_type == 'new' %}class="active"{% endif %}>
-  <a href="{% url scan_list change_type='new'%}">
+  <a href="{% url 'scan_list' change_type='new'%}">
     ({{ new_count }}) {% trans 'New devices' %}
   </a>
   </li>
   <li {% if change_type == 'existing' %}class="active"{% endif %}>
-  <a href="{% url scan_list change_type='existing'%}">
+  <a href="{% url 'scan_list' change_type='existing'%}">
     ({{ changed_count }}) {% trans 'Changed devices' %}
   </a>
   </li>
@@ -39,7 +39,7 @@
   {% table_header columns url_query %}
   {% for scan_summary in bob_page %}
   <tr>
-    <td><a href="{%url scan_results scan_summary.job_id%}">
+    <td><a href="{%url 'scan_results' scan_summary.job_id%}">
         {{ scan_summary.ipaddress }}
     </a></td>
     {% if change_type == 'existing' and scan_summary.device %}
@@ -50,7 +50,7 @@
     <td>{{ scan_summary.modified }}</td>
     {% if change_type == 'existing' and scan_summary.device %}
     <td>
-      <a href="{% url search details='info' device=scan_summary.device.id %}">
+      <a href="{% url 'search' details='info' device=scan_summary.device.id %}">
         {{ scan_summary.device }}
       </a>
     </td>

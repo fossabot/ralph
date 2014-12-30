@@ -1,5 +1,5 @@
 {% extends "ui/base-devices.html" %}
-{% load url from future %}
+
 {% load icons %}
 
 
@@ -28,7 +28,7 @@
     <th>Plugin</th>
     <th>Address</th>
     <th>Message</th>
-</tr>    
+</tr>
 {% for warning in warnings %}
 <tr>
     <td>{{ warning.date }}</td>

@@ -1,4 +1,4 @@
-{% load url from future %}
+
 {% load icons %}
 {% load formats %}
 
@@ -10,7 +10,7 @@
         {% for f in form.hidden_fields %}{{ f }}{% endfor %}
             {% for f in form.visible_fields %}
             {% if f.name != 'save_comment' %}
-            <div class="control-group 
+            <div class="control-group
                     {{ f.css_classes }}
                     {% if f.errors %}error{% endif %}
                     {% if f.name in form.manual_fields %}warning{% endif %}
