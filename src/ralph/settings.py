@@ -166,8 +166,6 @@ FORCE_SCRIPT_NAME = ''
 import os
 import ralph
 TEST_DISCOVER_ROOT = os.path.realpath(os.path.dirname(ralph.__file__))
-TEST_RUNNER = b'discover_runner.DiscoverRunner'
-# django.contrib.auth settings
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )

@@ -51,7 +51,6 @@ def main():
 
     from django.core.management import execute_from_command_line
 
-    sys.argv[0] = os.path.dirname(__file__)
     try:
         execute_from_command_line(sys.argv)
     except Exception:

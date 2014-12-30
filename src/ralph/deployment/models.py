@@ -18,7 +18,6 @@ from lck.django.common.models import (
     MACAddressField, Named, TimeTrackable,
     WithConcurrentGetOrCreate, EditorTrackable,
 )
-
 from ralph.discovery.models import Device, DeviceEnvironment, ServiceCatalog
 
 

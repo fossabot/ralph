@@ -1,7 +1,7 @@
 import pluggableapp
 
 from django.contrib.auth.decorators import login_required
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import patterns, include, url
 from django.views.generic import RedirectView
 from dnsedit.api import PowerDnsRecordResource
 from tastypie.api import Api

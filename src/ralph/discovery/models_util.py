@@ -32,6 +32,6 @@ class SavingUser(db.Model):
     class Meta:
         abstract = True
 
-    def save(self, user=None, *args, **kwargs):
-        self.saving_user = user
-        return super(SavingUser, self).save(user=user, *args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.saving_user = kwargs.pop('user', None)
+        return super(SavingUser, self).save(*args, **kwargs)

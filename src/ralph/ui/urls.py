@@ -4,9 +4,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
-from django.views.generic.simple import redirect_to
+from django.views.generic import RedirectView
 
 from ralph.ui.views import typeahead_roles, unlock_field, logout
 from ralph.ui.views.common import (
@@ -256,8 +256,7 @@ urlpatterns = patterns(
 
     url(r'^racks/$',
         login_required(RacksDeviceList.as_view()), {}, 'racks'),
-    url(r'^racks/-/rack/$', redirect_to,
-        {'url': '/ui/racks/-/info/'}),
+    url(r'^racks/-/rack/$', RedirectView.as_view(url='/ui/racks/-/info/')),
     url(r'^racks/view/(?P<data_center>[-\w]*)/$',
         login_required(DataCenterView.as_view()), {}, 'data_center_view'),
     url(r'^racks/(?P<rack>[-\w]*)/(?P<details>add_device)/(?P<device>)$',

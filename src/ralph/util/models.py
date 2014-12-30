@@ -29,13 +29,6 @@ def create_api_key_ignore_dberrors(*args, **kwargs):
         transaction.rollback_unless_managed()
 
 db.signals.post_save.connect(create_api_key_ignore_dberrors, sender=User)
-
-
-# workaround for a unit test bug in Django 1.4.x
-
-from django.contrib.auth.tests import models as auth_test_models
-del auth_test_models.ProfileTestCase.test_site_profile_not_available
-
 # signal used by SyncFieldMixin for sending notifications on changed fields
 fields_synced_signal = Signal(providing_args=['changes', 'change_author'])
 
