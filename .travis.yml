@@ -23,6 +23,7 @@ install:
 # command to run tests, e.g. python setup.py test
 script: make test-with-coveralls
 before_script:
+  mysql -e 'CREATE DATABASE ralph CHARACTER SET utf8 COLLATE utf8_general_ci;'
   make flake
 
 after_success:
