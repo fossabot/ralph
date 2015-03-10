@@ -43,6 +43,10 @@
                 }
                 .rack {
                     &.move {
+                        -webkit-transition: none;
+                        -moz-transition: none;
+                        -o-transition: none;
+                        transition: none;
                         border-style: dashed;
                         &.not_allowed{background-color: red;}
                         &.allowed{background-color: #2a3;}
@@ -103,12 +107,15 @@
                 @label-height: 1.4em;
                 .generate-x-position(@grid-count);
                 .generate-y-position(@grid-count);
-                &.rotate-left {transform: rotate(-90deg);}
+                -webkit-transition: .3s ease-in-out;
+                -moz-transition: .3s ease-in-out;
+                -o-transition: .3s ease-in-out;
+                transition: .3  s ease-in-out;
+                &.rotate-top {transform: rotate(0deg);}
+                &.rotate-right {transform: rotate(90deg);}
+                &.rotate-bottom {transform: rotate(180deg);}
+                &.rotate-left {transform: rotate(270deg);}
                 &.rotate-right {
-                    transform: rotate(90deg);
-                    .used, .name {
-                        transform: rotate(180deg);
-                    }
                     .wrapper .progress.red {
                         left: 0;
                     }
@@ -119,19 +126,8 @@
                     }
                 }
                 &.rotate-bottom{
-                    .used {
-                        top: 0;
-                    }
-                    .name {
-                        position: absolute;
-                        bottom: 0;
-                        min-width: 100%;
-                    }
                     .wrapper .progress {
-                        bottom: @label-height;
-                    }
-                    .tools {
-                        transform: rotate(180deg);
+                        top: @label-height;
                     }
                 }
                 .generate-x-position(@grid-count);
@@ -186,8 +182,18 @@
                         margin:0;
                         border-radius: 0;
                         height: 5px;
-                        &.red {background: #a33;z-index:2;border-left: 1px solid #000;right:0;box-sizing:border-box;}
-                        &.green {background: #3f3;width:100%;z-index:1;}
+                        &.red {
+                            background: #a33;
+                            z-index: 2;
+                            left: 0;
+                            box-sizing: border-box;
+                        }
+                        &.green {
+                            background: #3f3;
+                            width: 100%;
+                            z-index: 1;
+                            right: 0;
+                        }
                     }
                     .free {
                         text-align: center;

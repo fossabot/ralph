@@ -335,6 +335,10 @@
   display: none;
 }
 .data-center .grid.edit .grid_wrapper .rack.move {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  transition: none;
   border-style: dashed;
 }
 .data-center .grid.edit .grid_wrapper .rack.move.not_allowed {
@@ -388,6 +392,10 @@
   background-size: 40px 40px;
 }
 .data-center .grid .grid_wrapper .rack {
+  -webkit-transition: 0.3s ease-in-out;
+  -moz-transition: 0.3s ease-in-out;
+  -o-transition: 0.3s ease-in-out;
+  transition: 0.3 s ease-in-out;
   box-sizing: border-box;
   position: absolute;
   background: #888888;
@@ -635,15 +643,17 @@
 .data-center .grid .grid_wrapper .rack.y-40 {
   top: 1600px;
 }
-.data-center .grid .grid_wrapper .rack.rotate-left {
-  transform: rotate(-90deg);
+.data-center .grid .grid_wrapper .rack.rotate-top {
+  transform: rotate(0deg);
 }
 .data-center .grid .grid_wrapper .rack.rotate-right {
   transform: rotate(90deg);
 }
-.data-center .grid .grid_wrapper .rack.rotate-right .used,
-.data-center .grid .grid_wrapper .rack.rotate-right .name {
+.data-center .grid .grid_wrapper .rack.rotate-bottom {
   transform: rotate(180deg);
+}
+.data-center .grid .grid_wrapper .rack.rotate-left {
+  transform: rotate(270deg);
 }
 .data-center .grid .grid_wrapper .rack.rotate-right .wrapper .progress.red {
   left: 0;
@@ -652,19 +662,8 @@
 .data-center .grid .grid_wrapper .rack.rotate-left .wrapper .progress {
   top: 1.4em;
 }
-.data-center .grid .grid_wrapper .rack.rotate-bottom .used {
-  top: 0;
-}
-.data-center .grid .grid_wrapper .rack.rotate-bottom .name {
-  position: absolute;
-  bottom: 0;
-  min-width: 100%;
-}
 .data-center .grid .grid_wrapper .rack.rotate-bottom .wrapper .progress {
-  bottom: 1.4em;
-}
-.data-center .grid .grid_wrapper .rack.rotate-bottom .tools {
-  transform: rotate(180deg);
+  top: 1.4em;
 }
 .data-center .grid .grid_wrapper .rack.x-1 {
   left: 40px;
@@ -956,14 +955,14 @@
 .data-center .grid .grid_wrapper .rack .wrapper .progress.red {
   background: #a33;
   z-index: 2;
-  border-left: 1px solid #000;
-  right: 0;
+  left: 0;
   box-sizing: border-box;
 }
 .data-center .grid .grid_wrapper .rack .wrapper .progress.green {
   background: #3f3;
   width: 100%;
   z-index: 1;
+  right: 0;
 }
 .data-center .grid .grid_wrapper .rack .wrapper .free {
   text-align: center;
