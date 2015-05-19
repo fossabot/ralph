@@ -7,7 +7,6 @@ addons:
 python:
   - "2.7"
   - "3.4"
-  - "pypy"
 
 env:
   - TRAVIS_DB=postgres
@@ -17,15 +16,20 @@ matrix:
   fast_finish: true
 
 before_install:
-    - pip install flake8 --use-mirrors
-    - make flake
+  - pip install flake8 --use-mirrors
+  - make flake
 
 install:
-    - make install-test
-    - pip install coveralls
+  - if [[ $TRAVIS_DB == 'postgres' ]]; pip install psycopg2 ; fi
+  - make install-test
+  - pip install coveralls
+
+before_script:
+  - if [[ $TRAVIS_DB == 'postgres' ]]; then psql -c 'CREATE DATABASE travis_ci_test;' -U postgres ; fi
+  - if [[ $TRAVIS_DB == 'mysql' ]]; then mysql -e 'CREATE DATABASE ralph CHARACTER SET utf8 COLLATE utf8_general_ci;' -uroot ; fi
 
 script:
-    - make coveralls
+  - make coveralls
 
 after_success:
   - coveralls
