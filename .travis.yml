@@ -1,11 +1,20 @@
 sudo: false
 language: python
 
+addons:
+  postgresql: "9.3"
+
 python:
   - "2.7"
-  - "3.3"
   - "3.4"
   - "pypy"
+
+env:
+  - TRAVIS_DB=postgres
+  - TRAVIS_DB=mysql
+
+matrix:
+  fast_finish: true
 
 before_install:
     - pip install flake8 --use-mirrors
