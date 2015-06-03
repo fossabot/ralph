@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 @python_2_unicode_compatible
 class NamedMixin(models.Model):
     """Describes an abstract model with a unique ``name`` field."""
-    name = models.CharField(_('name'), max_length=50, unique=True)
+    name = models.CharField(_('name'), max_length=150, unique=True)
 
     class Meta:
         abstract = True
@@ -23,7 +23,7 @@ class NamedMixin(models.Model):
     @python_2_unicode_compatible
     class NonUnique(models.Model):
         """Describes an abstract model with a non-unique ``name`` field."""
-        name = models.CharField(verbose_name=_("name"), max_length=75)
+        name = models.CharField(verbose_name=_("name"), max_length=150)
 
         class Meta:
             abstract = True

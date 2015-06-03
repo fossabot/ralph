@@ -34,7 +34,6 @@ class Migration(migrations.Migration):
                 ('license_details', models.CharField(default='', max_length=1024, verbose_name='License details', blank=True)),
             ],
             options={
-                'ordering': ('-modified', '-created'),
                 'abstract': False,
             },
         ),
@@ -51,7 +50,7 @@ class Migration(migrations.Migration):
             name='LicenceType',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(unique=True, max_length=50, verbose_name='name')),
+                ('name', models.CharField(unique=True, max_length=150, verbose_name='name')),
             ],
             options={
                 'abstract': False,
@@ -70,7 +69,7 @@ class Migration(migrations.Migration):
             name='SoftwareCategory',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(unique=True, max_length=50, verbose_name='name')),
+                ('name', models.CharField(unique=True, max_length=150, verbose_name='name')),
             ],
             options={
                 'abstract': False,

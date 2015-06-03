@@ -86,7 +86,7 @@ class Command(BaseCommand):
             headers, csv_body = csv_data[0], csv_data[1:]
             model_resource = get_resource(options.get('model_name'))
             dataset = tablib.Dataset(*csv_body, headers=headers)
-            result = model_resource.import_data(dataset, dry_run=True)
+            result = model_resource.import_data(dataset, dry_run=False)
             if result.has_errors():
                 for idx, row in enumerate(result.rows):
                     for error in row.errors:
@@ -97,21 +97,21 @@ class Command(BaseCommand):
                             '',
                         ])
                         self.stdout.write(error_msg)
-            else:
-                if options.get('noinput'):
-                    result = model_resource.import_data(dataset, dry_run=False)
-                else:
-                    for idx, row in enumerate(result.rows):
-                        if not row.new_record:
-                            info_msg = 'Update: {} {}'.format(
-                                idx + 1,
-                                row.diff
-                            )
-                            self.stdout.write(info_msg)
-                    answer = input("type 'yes' to save data" + os.linesep)
-                    if answer == 'yes':
-                        result = model_resource.import_data(
-                            dataset,
-                            dry_run=False
-                        )
-                    self.stdout.write("Done")
+            # else:
+            #     if options.get('noinput'):
+            #         result = model_resource.import_data(dataset, dry_run=False)
+            #     else:
+            #         for idx, row in enumerate(result.rows):
+            #             if not row.new_record:
+            #                 info_msg = 'Update: {} {}'.format(
+            #                     idx + 1,
+            #                     row.diff
+            #                 )
+            #                 self.stdout.write(info_msg)
+            #         answer = input("type 'yes' to save data" + os.linesep)
+            #         if answer == 'yes':
+            #             result = model_resource.import_data(
+            #                 dataset,
+            #                 dry_run=False
+            #             )
+            #         self.stdout.write("Done")
