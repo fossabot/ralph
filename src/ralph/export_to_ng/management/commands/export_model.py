@@ -38,8 +38,8 @@ ralph.data_center.models.physical.Rack
 ralph.data_center.models.physical.Connection
 ralph.data_center.models.components.DiskShare
 ralph.data_center.models.components.DiskShareMount
-ralph.licences.models.Licence
-ralph.supports.models.Support
++ralph.licences.models.Licence
++ralph.supports.models.Support
 
 ManyToMany Models:
 +ralph.assets.models.assets.ServiceEnvironment
@@ -92,14 +92,14 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option(
-            '--model_name',
+            '--model-name',
             #action='store_true',
             #dest='delete',
             #default=False,
             help='The model name up to export (type "ralph export_to_ng -h" for possible models)',
         ),
         make_option(
-            '--data_file',
+            '--data-file',
             #action='store_true',
             #dest='delete',
             #default=False,

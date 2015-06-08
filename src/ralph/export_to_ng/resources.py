@@ -245,4 +245,71 @@ class ServiceResource(RalphResourceMixin, resources.ModelResource):
 class EnvironmentResource(EmptyIdMixin, resources.ModelResource):
     class Meta:
         fields = ('id', 'name', 'created', 'modified',)
-        model = models_device.DeviceEnvironment
+
+
+######### AREK
+from ralph_assets.licences.models import Licence, LicenceAsset, LicenceUser
+from ralph_assets.models_support import Support
+
+
+class LicenceResource(resources.ModelResource):
+#     # ralph.licences.models.Licence
+    class Meta:
+        model = Licence
+        fields = [
+            'id', 'created', 'modified', 'manufacturer_id', 'licence_type_id',
+            'software_category_id', 'number_bought', 'sn', 'niw', 'valid_thru',
+            'order_no', 'price', 'accounting_id', 'invoice_date', 'provider',
+            'invoice_no', 'remarks', 'license_details', 'licence_type',
+            'software_category'
+        ]
+
+    def dehydrate_manufacturer(self, licence):
+        return licence.manufacturer.name
+
+    def dehydrate_licence_type(self, licence):
+        return licence.licence_type.name
+
+    def dehydrate_software_category(self, licence):
+        return licence.software_category.name
+
+
+class LicenceAssetResource(resources.ModelResource):
+    class Meta:
+        model = LicenceAsset
+
+    def dehydrate_asset(self, rel):
+        return rel.asset.barcode
+
+    def dehydrate_licence(self, rel):
+        return rel.licence.niw
+
+
+class LicenceUserResource(resources.ModelResource):
+    class Meta:
+        model = LicenceUser
+
+    def dehydrate_user(self, rel):
+        return rel.user.username
+
+    def dehydrate_licence(self, rel):
+        return rel.licence.niw
+
+
+class SupportAssetResource(resources.ModelResource):
+    class Meta:
+        model = Support.assets.through
+
+
+class SupportResource(resources.ModelResource):
+    # ralph.supports.models.Support
+    class Meta:
+        model = Support
+        fields = [
+            'id', 'name', 'created', 'modified', 'contract_id', 'description',
+            'price', 'date_from', 'date_to', 'escalation_path',
+            'contract_terms', 'additional_notes', 'sla_type', 'status',
+            'producer', 'supplier', 'serial_no', 'invoice_no', 'invoice_date',
+            'period_in_months'
+        ]
+######### END AREK
