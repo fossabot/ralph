@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,16 +14,7 @@ from ralph.admin.views.multiadd import MulitiAddAdminMixin
 from ralph.assets.invoice_report import AssetInvoiceReportMixin
 from ralph.assets.models.components import GenericComponent as AssetComponent
 from ralph.attachments.admin import AttachmentsMixin
-from ralph.data_center.forms.network import NetworkInlineFormset
 from ralph.data_center.models.components import DiskShare, DiskShareMount
-from ralph.data_center.models.networks import (
-    DiscoveryQueue,
-    IPAddress,
-    Network,
-    NetworkEnvironment,
-    NetworkKind,
-    NetworkTerminator
-)
 from ralph.data_center.models.physical import (
     Accessory,
     Connection,
@@ -39,6 +29,8 @@ from ralph.data_center.views.ui import DataCenterAssetSecurityInfo
 from ralph.data_importer import resources
 from ralph.lib.transitions.admin import TransitionAdminMixin
 from ralph.licences.models import BaseObjectLicence
+from ralph.networks.forms import NetworkInlineFormset
+from ralph.networks.models.networks import IPAddress
 from ralph.operations.views import OperationViewReadOnlyForExisiting
 from ralph.supports.models import BaseObjectsSupport
 
@@ -129,6 +121,7 @@ class DataCenterAssetAdmin(
     RalphAdmin,
 ):
     """Data Center Asset admin class."""
+
     actions = ['bulk_edit_action']
     change_views = [
         DataCenterAssetComponents,
@@ -288,40 +281,3 @@ class DiskShareAdmin(RalphAdmin):
 @register(DiskShareMount)
 class DiskShareMountAdmin(RalphAdmin):
     pass
-
-
-@register(Network)
-class NetworkAdmin(RalphAdmin):
-
-    resource_class = resources.NetworkResource
-
-
-@register(NetworkEnvironment)
-class NetworkEnvironmentAdmin(RalphAdmin):
-    pass
-
-
-@register(NetworkKind)
-class NetworkKindAdmin(RalphAdmin):
-    pass
-
-
-@register(NetworkTerminator)
-class NetworkTerminatorAdmin(RalphAdmin):
-    pass
-
-
-@register(DiscoveryQueue)
-class DiscoveryQueueAdmin(RalphAdmin):
-    pass
-
-
-@register(IPAddress)
-class IPAddressAdmin(RalphAdmin):
-
-    search_fields = ['address']
-    list_filter = ['is_public', 'is_management']
-    list_display = ['address', 'base_object', 'is_public']
-    list_select_related = ['base_object']
-    raw_id_fields = ['base_object']
-    resource_class = resources.IPAddressResource

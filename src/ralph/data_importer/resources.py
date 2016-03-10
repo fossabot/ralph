@@ -9,7 +9,7 @@ from ralph.back_office.models import (
     OfficeInfrastructure,
     Warehouse
 )
-from ralph.data_center.models import networks, physical
+from ralph.data_center.models import physical
 from ralph.data_importer.fields import ThroughField
 from ralph.data_importer.mixins import (
     ImportForeignKeyMeta,
@@ -32,6 +32,7 @@ from ralph.licences.models import (
     LicenceUser,
     Software
 )
+from ralph.networks.models import networks
 from ralph.operations.models import Operation, OperationType
 from ralph.supports.models import BaseObjectsSupport, Support, SupportType
 
@@ -194,6 +195,7 @@ class NetworkResource(RalphModelResource):
 
     class Meta:
         model = networks.Network
+        exclude = ('gateway_as_int', 'min_ip', 'max_ip')
 
 
 class IPAddressResource(RalphModelResource):
