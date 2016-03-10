@@ -20,7 +20,7 @@ class IPNetwork(Field):
         super().__init__(*args, **kwargs)
 
     def db_type(self, connection):
-        return CharField(max_length=50).db_type(connection)
+        return CharField(max_length=44).db_type(connection)
 
     def to_python(self, value):
         if isinstance(value, ipaddress.IPv4Network):

@@ -13,6 +13,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RemoveField(
+            model_name='network',
+            name='terminators',
+        ),
         migrations.DeleteModel(
             name='NetworkTerminator',
         ),
@@ -53,7 +57,7 @@ class Migration(migrations.Migration):
             field=models.DecimalField(decimal_places=0, default=0, max_digits=39, verbose_name='smallest IP number', editable=False),
             preserve_default=False,
         ),
-        migrations.AlterField(
+        migrations.AddField(
             model_name='network',
             name='terminators',
             field=models.ManyToManyField(to='assets.BaseObject', verbose_name='network terminators', blank=True),
