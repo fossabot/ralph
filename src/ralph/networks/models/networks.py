@@ -292,7 +292,9 @@ class Network(
 
     def search_networks(self):
         """
-        Search networks (ancestors) order by smallest.
+        Search networks (ancestors) order first by min_ip descending,
+        then by max_ip ascending, to get smallest ancestor network
+        containing current network.
         """
         nets = Network.objects.filter(
             min_ip__lte=self.min_ip,
@@ -400,7 +402,9 @@ class IPAddress(LastSeenMixin, TimeStampMixin, NetworkMixin, models.Model):
 
     def search_networks(self):
         """
-        Search networks (ancestors) order by smallest.
+        Search networks (ancestors) order first by min_ip descending,
+        then by max_ip ascending, to get smallest ancestor network
+        containing current network.
         """
         int_value = int(self.ip)
         nets = Network.objects.filter(
