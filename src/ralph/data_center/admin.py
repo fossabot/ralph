@@ -4,11 +4,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from ralph.admin import RalphAdmin, RalphTabularInline, register
-from ralph.admin.filters import (
-    LiquidatedStatusFilter,
-    TagsListFilter,
-    TextListFilter
-)
+from ralph.admin.filters import IPFilter, LiquidatedStatusFilter, TagsListFilter
 from ralph.admin.helpers import generate_html_link
 from ralph.admin.m2m import RalphTabularM2MInline
 from ralph.admin.mixins import BulkEditChangeListMixin
@@ -176,9 +172,8 @@ class DataCenterAssetAdmin(
         'order_no', 'model__name', 'service_env', 'depreciation_end_date',
         'force_depreciation', 'remarks', 'budget_info', 'rack',
         'rack__server_room', 'rack__server_room__data_center', 'position',
-        'property_of', LiquidatedStatusFilter,
-        ('management_ip', TextListFilter),
-        'management_hostname', ('tags', TagsListFilter)
+        'property_of', LiquidatedStatusFilter, IPFilter,
+        ('tags', TagsListFilter)
     ]
     date_hierarchy = 'created'
     list_select_related = [
