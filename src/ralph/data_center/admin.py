@@ -198,7 +198,7 @@ class DataCenterAssetAdmin(
     bulk_edit_no_fillable = ['barcode', 'sn']
     search_fields = ['barcode', 'sn', 'hostname', 'invoice_no', 'order_no']
     list_filter = [
-        'status', 'barcode', 'sn', 'hostname', 'invoice_no', 'invoice_date',
+        'hostname', 'status', 'barcode', 'sn', 'invoice_no', 'invoice_date',
         'order_no', 'model__name', 'service_env', 'depreciation_end_date',
         'force_depreciation', 'remarks', 'budget_info', 'rack',
         'rack__server_room', 'rack__server_room__data_center', 'position',
