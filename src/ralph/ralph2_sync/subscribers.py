@@ -43,6 +43,7 @@ model_mapping = {
     'Rack': Rack,
     'Venture': ConfigurationModule,
     'VentureRole': ConfigurationClass,
+    'IPAddress': IPAddress,
 }
 
 
