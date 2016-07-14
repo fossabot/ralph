@@ -154,10 +154,18 @@ class IPAddress(models.Model):
         pass
 
 
+class Department(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta(generate_meta(app_label='business', model_name='department')):
+        pass
+
+
 class Venture(models.Model):
     name = models.CharField(max_length=255)
     parent = models.ForeignKey('self', null=True, related_name="child_set")
     symbol = models.CharField(max_length=32)
+    department = models.ForeignKey(Department)
 
     class Meta(generate_meta(app_label='business', model_name='venture')):
         pass
