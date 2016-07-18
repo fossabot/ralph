@@ -70,6 +70,12 @@ def entries_on_stock(mac, ip, eth_device, ip_device, devices_on_stock):
         print_row(*row)
 
 
+def entry_without_address(mac, ip, eth_device, ip_device):
+    if eth_device and not IPAddress.objects.filter(address=ip, device=eth_device).exists():  # noqa
+        fields = ['id', 'name', 'venture__name', 'venture__department__name']  # noqa
+        print_row(mac, ip, *generate_row(eth_device, *fields))
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
@@ -151,6 +157,12 @@ class Command(BaseCommand):
         )
         for mac, ip, eth_device, ip_device in results:
             entry_without_device(mac, ip, eth_device, ip_device)
+
+        self.stdout.write(
+            self.style.NOTICE('In DHCP but without "detected addresses"')
+        )
+        for mac, ip, eth_device, ip_device in results:
+            entry_without_address(mac, ip, eth_device, ip_device)
 
         if options['stock_ventures'] or options['stock_services']:
             self.stdout.write(
