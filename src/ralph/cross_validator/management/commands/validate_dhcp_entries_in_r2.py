@@ -172,4 +172,3 @@ class Command(BaseCommand):
             self.style.NOTICE('Set of MACs')
         )
         print(*set(all_macs), sep='\n')
-
