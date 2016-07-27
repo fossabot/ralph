@@ -288,6 +288,8 @@ def sync_network_kind_to_ralph3(sender, instance=None, created=False, **kwargs):
 def sync_network_to_ralph3(sender, instance=None, created=False, **kwargs):
     net = instance
 
+    print('\nNETWORK {}'.format(net.terminators.count()))
+
     def get_reserved_ips(net):
         start = net.min_ip
         end = net.max_ip
