@@ -15,6 +15,27 @@ REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] = (
     'rest_framework.authentication.SessionAuthentication',
 )
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+            'loaders': [
+                ('django.template.loaders.cached.Loader', [
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'ralph.lib.template.loaders.AppTemplateLoader',
+                ]),
+            ],
+        },
+    },
+]
+
 if os.environ.get('STORE_SESSIONS_IN_REDIS'):
     SESSION_ENGINE = 'redis_sessions.session'
     SESSION_REDIS_HOST = REDIS_CONNECTION['HOST']
