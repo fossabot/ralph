@@ -29,7 +29,7 @@
           </ul>
           <section class="top-bar-section">
             <!-- user cache key: {{ request.user.permissions_hash }} -->
-            {% cache 86400 header_menu opts.app_label opts.model_name request.user.permissions_hash %}
+            {% cache 86400 header_menu opts.app_label opts.model_name request.user.permissions_hash LANGUAGE_CODE %}
             {% spaceless %}
             <!-- cache -->
               {% sitetree_menu from "ralph_admin" include "trunk" template "admin/menu_admin.html" %}
@@ -62,7 +62,7 @@
         </nav>
         {% block breadcrumbs %}
           {% if not original or original.modified %}
-            {% cache 86400 breadcrumbs opts.app_label opts.model_name original.modified %}
+            {% cache 86400 breadcrumbs opts.app_label opts.model_name original.modified LANGUAGE_CODE %}
             <!-- cache -->
               {% spaceless %}
                 {% sitetree_breadcrumbs from "ralph_admin" template "admin/breadcrumbs_foundation.html" %}

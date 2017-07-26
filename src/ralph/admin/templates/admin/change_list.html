@@ -83,7 +83,7 @@
             {% if cl.has_filters %}
               {# TODO: request.user.permissions_hash if filters respect permissions #}
               {% if not request.GET %}
-                {% cache 3600 filters opts.app_label opts.model_name %}
+                {% cache 3600 filters opts.app_label opts.model_name LANGUAGE_CODE %}
                   <!-- cache -->
                   {% spaceless %}
                     {% include 'admin/partials/filters.html' %}
